@@ -77,12 +77,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\libfft.cpp" />
-    <ClCompile Include="..\src\main.cpp" />
+    <ClInclude Include="libfft.h" />
+    <ClInclude Include="listener.h" />
+    <ClInclude Include="portaudio.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\libfft.h" />
-    <ClInclude Include="..\src\portaudio.h" />
+    <ClCompile Include="libfft.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
