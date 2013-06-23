@@ -27,6 +27,9 @@
     <ClInclude Include="glwrap.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="vect2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libfft.cpp">
@@ -36,6 +39,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="glwrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fakelistener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="picopng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

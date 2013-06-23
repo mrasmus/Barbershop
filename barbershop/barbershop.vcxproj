@@ -84,11 +84,14 @@
     <ClInclude Include="libfft.h" />
     <ClInclude Include="listener.h" />
     <ClInclude Include="portaudio.h" />
+    <ClInclude Include="vect2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="fakelistener.cpp" />
     <ClCompile Include="glwrap.cpp" />
     <ClCompile Include="libfft.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="picopng.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
