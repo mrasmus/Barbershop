@@ -130,6 +130,8 @@ int main(int argc, char **argv)
 {
   //fakeListenerInit();
 
+  initListener();
+
   int width = 1024, height = 768;
   
   createglwindow("Test", width, height, 32, false);
@@ -174,17 +176,21 @@ int main(int argc, char **argv)
     glLoadIdentity();
 
     float pitches[4], amplitudes[4];
-    currentValues(pitches, amplitudes);
+    for(int i=0; i<4; i++)
+    {
+      pitches   [i] = playerData[i].frequency;
+      amplitudes[i] = playerData[i].amplitude;
+    }
 
     for(int i=0; i<4; i++) position[i] += sin((float)i);
 
-    printf("%g %g %g %g\n", amplitudes[0], amplitudes[1], amplitudes[2], amplitudes[3]);
+    printf("%g %g %g %g\n", pitches[0], pitches[1], pitches[2], pitches[3]);
 
     float offsets[4];
     for(int i=0; i<4; i++)
     {
-      while(pitches[i] <  110) pitches[i] *= 2;
-      while(pitches[i] >= 220) pitches[i] /= 2;
+      //while(pitches[i] <  110) pitches[i] *= 2;
+      //while(pitches[i] >= 220) pitches[i] /= 2;
       offsets[i] = (pitches[i]-110)/110;
     }
 
