@@ -145,6 +145,14 @@ void drawDog(point p, float angle, int dogfur, int dogoverlay, int player)
   glEnd();
 }
 
+struct Calibration
+{
+  float room_volume;
+  int samples;
+};
+
+Calibration calibrations[4];
+
 int main(int argc, char **argv)
 {
   //fakeListenerInit();
@@ -195,21 +203,35 @@ int main(int argc, char **argv)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float pitches[4], amplitudes[4];
+    float pitches[4] = { 0, 0, 0, 0 }, amplitudes[4] = { 0, 0, 0, 0 };
     float pitch_sans_octave[4] = { 110, 110, 110, 110 };
+    bool singing[4] = { false, false, false, false };
 
     for(int i=0; i<4; i++)
     {
-      amplitudes[i] = playerData[i].amplitude;
-      if(amplitudes[i] > 0.01)
+      /*if(calibrations[i].samples < 50)
       {
-        pitches[i] = playerData[i].frequency*0.1 + pitches[i]*0.9;
-        pitch_sans_octave[i] = pitches[i];
-        if(pitch_sans_octave[i] <= 0) pitch_sans_octave[i] = 110;
-        while(pitch_sans_octave[i] <  110) pitch_sans_octave[i] *= 2;
-        while(pitch_sans_octave[i] >= 220) pitch_sans_octave[i] /= 2;
+        calibrations[i].room_volume += playerData[i].amplitude;
+        if(++calibrations[i].samples >= 50)
+          calibrations[i].room_volume /= 50;
+      }
+      else*/
+      float thresholds[4] = { 0.25, 0.01, 0.1, 0.1 };
+      {
+        amplitudes[i] = playerData[i].amplitude; // / calibrations[i].room_volume;
+        if(amplitudes[i] > thresholds[i])
+        {
+          singing[i] = true;
+          pitches[i] = playerData[i].frequency*0.1 + pitches[i]*0.9;
+          pitch_sans_octave[i] = pitches[i];
+          if(pitch_sans_octave[i] <= 0) pitch_sans_octave[i] = 110;
+          while(pitch_sans_octave[i] <  110) pitch_sans_octave[i] *= 2;
+          while(pitch_sans_octave[i] >= 220) pitch_sans_octave[i] /= 2;
+        }
       }
     }
+
+    printf("%g %g %g %g\n", amplitudes[0], amplitudes[1], amplitudes[2], amplitudes[3]);
 
     float offsets[4];
     for(int i=0; i<4; i++)
@@ -231,7 +253,7 @@ int main(int argc, char **argv)
       float c = fabs(offsets[i]-target_offsets[i]-1.5);
       distances[i] = min(a, min(b, c));
     }
-    for(int i=0; i<4; i++) position[i] += 1-distances[i];
+    for(int i=0; i<4; i++) if(singing[i]) position[i] += 1-distances[i];
 
     drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], target_offsets[0], 0);
     drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offsets[1], target_offsets[1], 1);
@@ -240,10 +262,10 @@ int main(int argc, char **argv)
     //offset += 0.01f;
     if(offset > 1) offset -= 1;
 
-    drawDog(vect2f(position[0], 580), sin(time/1.0)/2*amplitudes[0], dogfur, dogoverlay, 0);
-    drawDog(vect2f(position[1], 620), sin(time/0.8)/2*amplitudes[1], dogfur, dogoverlay, 1);
-    drawDog(vect2f(position[2], 660), sin(time/1.2)/2*amplitudes[2], dogfur, dogoverlay, 2);
-    drawDog(vect2f(position[3], 700), sin(time/1.1)/2*amplitudes[3], dogfur, dogoverlay, 3);
+    drawDog(vect2f(position[0], 580), singing[0]?(sin(time/1.0)/2):0, dogfur, dogoverlay, 0);
+    drawDog(vect2f(position[1], 620), singing[1]?(sin(time/1.0)/2):0, dogfur, dogoverlay, 1);
+    drawDog(vect2f(position[2], 660), singing[2]?(sin(time/1.0)/2):0, dogfur, dogoverlay, 2);
+    drawDog(vect2f(position[3], 700), singing[3]?(sin(time/1.0)/2):0, dogfur, dogoverlay, 3);
 
     glFinish();
     SwapBuffers(hdc);
