@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <vector>
+#include <windows.h>
 #include "glwrap.h"
 #include "listener.h"
 #include "vect2.h"
@@ -13,6 +14,24 @@ float player_color[4][4] =
   {0.5, 1.0, 1.0, 1.0},
   {1.0, 1.0, 0.5, 1.0}
 };
+
+float notes[12] = { 110, 116.5, 123.5, 130.8, 138.6, 146.8, 155.5, 164.8, 174.6, 185, 196, 207.7 };
+int chords[4][4] =
+{
+  { 0, 3,  7, 10 }, // CM
+  { 3, 7, 10,  2 }, // Eb7
+  { 8, 0,  3,  7 }, // Ab7
+  { 1, 5,  8,  0 }  // Db7
+};
+const int sequence_length = 4;
+
+static double hires_time()
+{
+  LARGE_INTEGER c, f;
+  QueryPerformanceCounter  (&c);
+  QueryPerformanceFrequency(&f);
+  return double(c.QuadPart)/double(f.QuadPart);
+}
 
 void drawBarberPole(int x, int y, int width, int height, float stripe_height,
   float stripe_gap, float stripe_slope, float stripe_offset,
@@ -32,7 +51,7 @@ void drawBarberPole(int x, int y, int width, int height, float stripe_height,
   glVertex2f(x+width, y);
 
   float wavelength = stripe_height+stripe_gap;
-  float offset = stripe_offset * wavelength;
+  float offset = stripe_offset * wavelength - wavelength/2;
 
   for(int i=offset-wavelength*2; i<height+wavelength*2; i+=stripe_height+stripe_gap)
   {
@@ -44,7 +63,7 @@ void drawBarberPole(int x, int y, int width, int height, float stripe_height,
     glVertex2f(x+width, i-width*stripe_slope+stripe_height);
   }
 
-  float toffset = target_offset*wavelength;
+  float toffset = target_offset*wavelength - wavelength/2;
   glColor4f(player_color[player][0]*0.6f, player_color[player][1]*0.6f, player_color[player][2]*0.6f, 0.75f);
   glVertex2f(x, y+height/2+wavelength/2-stripe_height+toffset);
   glVertex2f(x, y+height/2+wavelength/2+toffset);
@@ -150,11 +169,12 @@ int main(int argc, char **argv)
   int dogoverlay = loadTexture("dogoverlay.png");
 
   float position[4] = {50, 50, 50, 50};
+  float target_offsets[4] = {110, 110, 110, 110};
   
-  int time = 0;
+  float time = 0;
   for(;;)
   {
-    time++;
+    time = hires_time();
 
     MSG msg;
     if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -202,17 +222,23 @@ int main(int argc, char **argv)
       offsets[i] = (pitch_sans_octave[i]-110)/110;
     }
 
-    drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], 0.25, 0);
-    drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offsets[1], 0.25, 1);
-    drawBarberPole(450, 50, 150, 500, 100, 100, 0.7, offsets[2], 0.25, 2);
-    drawBarberPole(650, 50, 150, 500, 100, 100, 0.7, offsets[3], 0.25, 3);
+    for(int i=0; i<4; i++)
+    {
+      int chord = (int)(time / 5.0)%sequence_length;
+      target_offsets[i] = target_offsets[i]*0.9 + ((notes[chords[chord][i]] - 110) / 110)*0.1;
+    }
+
+    drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], target_offsets[0], 0);
+    drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offsets[1], target_offsets[1], 1);
+    drawBarberPole(450, 50, 150, 500, 100, 100, 0.7, offsets[2], target_offsets[2], 2);
+    drawBarberPole(650, 50, 150, 500, 100, 100, 0.7, offsets[3], target_offsets[3], 3);
     //offset += 0.01f;
     if(offset > 1) offset -= 1;
 
-    drawDog(vect2f(position[0], 580), sin(time/10.0)/2*amplitudes[0], dogfur, dogoverlay, 0);
-    drawDog(vect2f(position[1], 620), sin(time/ 8.0)/2*amplitudes[1], dogfur, dogoverlay, 1);
-    drawDog(vect2f(position[2], 660), sin(time/12.0)/2*amplitudes[2], dogfur, dogoverlay, 2);
-    drawDog(vect2f(position[3], 700), sin(time/11.0)/2*amplitudes[3], dogfur, dogoverlay, 3);
+    drawDog(vect2f(position[0], 580), sin(time/1.0)/2*amplitudes[0], dogfur, dogoverlay, 0);
+    drawDog(vect2f(position[1], 620), sin(time/0.8)/2*amplitudes[1], dogfur, dogoverlay, 1);
+    drawDog(vect2f(position[2], 660), sin(time/1.2)/2*amplitudes[2], dogfur, dogoverlay, 2);
+    drawDog(vect2f(position[3], 700), sin(time/1.1)/2*amplitudes[3], dogfur, dogoverlay, 3);
 
     glFinish();
     SwapBuffers(hdc);
