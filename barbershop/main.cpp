@@ -169,7 +169,7 @@ int main(int argc, char **argv)
   int dogoverlay = loadTexture("dogoverlay.png");
 
   float position[4] = {50, 50, 50, 50};
-  float target_offsets[4] = {110, 110, 110, 110};
+  float target_offsets[4] = {0, 0, 0, 0};
   
   float time = 0;
   for(;;)
@@ -211,11 +211,6 @@ int main(int argc, char **argv)
       }
     }
 
-    for(int i=0; i<4; i++) position[i] += sin((float)i);
-
-    printf("%g %g %g %g\n", pitch_sans_octave[0], pitch_sans_octave[1],
-      amplitudes[0], amplitudes[1]);
-
     float offsets[4];
     for(int i=0; i<4; i++)
     {
@@ -227,6 +222,16 @@ int main(int argc, char **argv)
       int chord = (int)(time / 5.0)%sequence_length;
       target_offsets[i] = target_offsets[i]*0.9 + ((notes[chords[chord][i]] - 110) / 110)*0.1;
     }
+
+    float distances[4];
+    for(int i=0; i<4; i++)
+    {
+      float a = fabs(offsets[i]-target_offsets[i]+0.5);
+      float b = fabs(offsets[i]-target_offsets[i]+1.5);
+      float c = fabs(offsets[i]-target_offsets[i]-1.5);
+      distances[i] = min(a, min(b, c));
+    }
+    for(int i=0; i<4; i++) position[i] += 1-distances[i];
 
     drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], target_offsets[0], 0);
     drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offsets[1], target_offsets[1], 1);
