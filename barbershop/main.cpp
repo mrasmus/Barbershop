@@ -173,29 +173,32 @@ int main(int argc, char **argv)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-/*    float freq[4], amp[4];
-    fakeListen(freq, amp);
-    
-    while(freq >= 220) freq /= 2;
-    while(freq <  110) freq *= 2;
-
-    printf("%f %f", freq, amp);*/
-
-    offset = 55.0/110.0;
+    float pitches[4], amplitudes[4];
+    currentValues(pitches, amplitudes);
 
     for(int i=0; i<4; i++) position[i] += sin((float)i);
 
-    drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offset, 0.25, 0);
-    drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offset, 0.25, 1);
-    drawBarberPole(450, 50, 150, 500, 100, 100, 0.7, offset, 0.25, 2);
-    drawBarberPole(650, 50, 150, 500, 100, 100, 0.7, offset, 0.25, 3);
+    printf("%g %g %g %g\n", amplitudes[0], amplitudes[1], amplitudes[2], amplitudes[3]);
+
+    float offsets[4];
+    for(int i=0; i<4; i++)
+    {
+      while(pitches[i] <  110) pitches[i] *= 2;
+      while(pitches[i] >= 220) pitches[i] /= 2;
+      offsets[i] = (pitches[i]-110)/110;
+    }
+
+    drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], 0.25, 0);
+    drawBarberPole(250, 50, 150, 500, 100, 100, 0.7, offsets[1], 0.25, 1);
+    drawBarberPole(450, 50, 150, 500, 100, 100, 0.7, offsets[2], 0.25, 2);
+    drawBarberPole(650, 50, 150, 500, 100, 100, 0.7, offsets[3], 0.25, 3);
     //offset += 0.01f;
     if(offset > 1) offset -= 1;
 
-    drawDog(vect2f(position[0], 520), sin(time/10.0)/3, dogfur, dogoverlay, 0);
-    drawDog(vect2f(position[1], 560), sin(time/8.0)/3, dogfur, dogoverlay, 1);
-    drawDog(vect2f(position[2], 600), sin(time/12.0)/3, dogfur, dogoverlay, 2);
-    drawDog(vect2f(position[3], 640), sin(time/11.0)/3, dogfur, dogoverlay, 3);
+    drawDog(vect2f(position[0], 580), sin(time/10.0)/2*amplitudes[0], dogfur, dogoverlay, 0);
+    drawDog(vect2f(position[1], 620), sin(time/ 8.0)/2*amplitudes[1], dogfur, dogoverlay, 1);
+    drawDog(vect2f(position[2], 660), sin(time/12.0)/2*amplitudes[2], dogfur, dogoverlay, 2);
+    drawDog(vect2f(position[3], 700), sin(time/11.0)/2*amplitudes[3], dogfur, dogoverlay, 3);
 
     glFinish();
     SwapBuffers(hdc);

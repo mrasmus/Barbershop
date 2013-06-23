@@ -87,9 +87,9 @@
     <ClInclude Include="vect2.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="fakelistener.cpp" />
     <ClCompile Include="glwrap.cpp" />
     <ClCompile Include="libfft.cpp" />
+    <ClCompile Include="listener.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="picopng.cpp" />
   </ItemGroup>

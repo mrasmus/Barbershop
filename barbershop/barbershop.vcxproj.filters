@@ -41,10 +41,10 @@
     <ClCompile Include="glwrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fakelistener.cpp">
+    <ClCompile Include="picopng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="picopng.cpp">
+    <ClCompile Include="listener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
