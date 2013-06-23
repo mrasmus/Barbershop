@@ -13,7 +13,7 @@
 /* -- some basic parameters -- */
 #define SAMPLE_RATE (44100)
 #define FFT_SIZE (8192)
-#define FFT_EXP_SIZE (13)
+#define FFT_EXP_SIZE (13) // 2**this == buffer size
 #define NUM_SECONDS (20)
 
 const float m_PI = 3.14159265f;
@@ -56,11 +56,12 @@ void * ReadMic( void * d )
 
 	computeSecondOrderLowPassParameters( SAMPLE_RATE, 330, a, b );
 
-
+  int buf = 0;
 	while (running)
 	{
+      buf = (buf+1)%4;
       // read some data
-      err = Pa_ReadStream( pData->stream, data, FFT_SIZE );
+      err = Pa_ReadStream( pData->stream, data+buf*(FFT_SIZE/4), FFT_SIZE/4 );
       if( err ) goto error; //FIXME: we don't want to err on xrun
 //	  printf("%f\t%f\t%f\t%f\n",data[0],data[25],data[50],data[60]);
 	  RMS = 0;
