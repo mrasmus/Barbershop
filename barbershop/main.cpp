@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   int dogoverlay = loadTexture("dogoverlay.png");
 
   float position[4] = {50, 50, 50, 50};
-
+  
   int time = 0;
   for(;;)
   {
@@ -176,22 +176,30 @@ int main(int argc, char **argv)
     glLoadIdentity();
 
     float pitches[4], amplitudes[4];
+    float pitch_sans_octave[4] = { 110, 110, 110, 110 };
+
     for(int i=0; i<4; i++)
     {
-      pitches   [i] = playerData[i].frequency;
       amplitudes[i] = playerData[i].amplitude;
+      if(amplitudes[i] > 0.01)
+      {
+        pitches[i] = playerData[i].frequency*0.1 + pitches[i]*0.9;
+        pitch_sans_octave[i] = pitches[i];
+        if(pitch_sans_octave[i] <= 0) pitch_sans_octave[i] = 110;
+        while(pitch_sans_octave[i] <  110) pitch_sans_octave[i] *= 2;
+        while(pitch_sans_octave[i] >= 220) pitch_sans_octave[i] /= 2;
+      }
     }
 
     for(int i=0; i<4; i++) position[i] += sin((float)i);
 
-    printf("%g %g %g %g\n", pitches[0], pitches[1], pitches[2], pitches[3]);
+    printf("%g %g %g %g\n", pitch_sans_octave[0], pitch_sans_octave[1],
+      amplitudes[0], amplitudes[1]);
 
     float offsets[4];
     for(int i=0; i<4; i++)
     {
-      //while(pitches[i] <  110) pitches[i] *= 2;
-      //while(pitches[i] >= 220) pitches[i] /= 2;
-      offsets[i] = (pitches[i]-110)/110;
+      offsets[i] = (pitch_sans_octave[i]-110)/110;
     }
 
     drawBarberPole( 50, 50, 150, 500, 100, 100, 0.7, offsets[0], 0.25, 0);
