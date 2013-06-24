@@ -152,10 +152,12 @@ int main(int argc, char **argv)
   float position[4] = {50, 50, 50, 50};
   
   int time = 0;
-  for(;;)
+  bool running = true;
+  while(running)
   {
     time++;
 
+#ifndef __APPLE__
     MSG msg;
     if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     { 
@@ -166,11 +168,13 @@ int main(int argc, char **argv)
         DispatchMessage (&msg);
       }
     }
+#endif
 
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, width, height, 0);
+	glOrtho(0,width,height,0,-1,1);  //equiv to below gluortho2d call
+    //gluOrtho2D(0, width, height, 0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -214,7 +218,18 @@ int main(int argc, char **argv)
     drawDog(vect2f(position[2], 660), sin(time/12.0)/2*amplitudes[2], dogfur, dogoverlay, 2);
     drawDog(vect2f(position[3], 700), sin(time/11.0)/2*amplitudes[3], dogfur, dogoverlay, 3);
 
+	//printf("Test");
     glFinish();
+#ifdef __APPLE__
+	glfwSwapBuffers();
+	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS 
+      || !glfwGetWindowParam(GLFW_OPENED))
+	{
+		running = false;
+	}
+#elif
     SwapBuffers(hdc);
+#endif
   }
+  killglwindow();
 }
