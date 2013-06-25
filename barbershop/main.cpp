@@ -198,10 +198,13 @@ int main(int argc, char **argv)
   float pitch_sans_octave[4] = { 110, 110, 110, 110 };
 
   float time = 0;
-  for(;;)
+
+  bool running = true;
+  while(running)
   {
     time = hires_time();
 
+#ifndef __APPLE__
     MSG msg;
     if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     { 
@@ -212,11 +215,13 @@ int main(int argc, char **argv)
         DispatchMessage (&msg);
       }
     }
+#endif
 
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, width, height, 0);
+    glOrtho(0,width,height,0,-1,1);  //equiv to below gluortho2d call
+    //gluOrtho2D(0, width, height, 0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -287,7 +292,18 @@ int main(int argc, char **argv)
     drawDog(vect2f(position[2], 700-fabs(sin(time*8))*10), singing[2]?(sin(time*4.0)/2):0, textures[2], 2);
     drawDog(vect2f(position[3], 740-fabs(sin(time*12))*10), singing[3]?(sin(time*4.0)/2):0, textures[3], 3);
 
+    //printf("Test");
     glFinish();
+#ifdef __APPLE__
+    glfwSwapBuffers();
+    if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS 
+      || !glfwGetWindowParam(GLFW_OPENED))
+    {
+      running = false;
+    }
+#elif WIN32
     SwapBuffers(hdc);
+#endif
   }
+  killglwindow();
 }

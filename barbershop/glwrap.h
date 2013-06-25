@@ -1,6 +1,10 @@
 #ifndef _GLWRAP_H
 #define _GLWRAP_H
 
+
+#ifdef __APPLE__
+#include <GL/glfw.h>
+#elif WIN32
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -9,6 +13,7 @@ extern HGLRC     hrc;
 extern HDC       hdc;
 extern HWND      hwnd;
 extern HINSTANCE hinst;
+#endif
 
 extern bool active;
 
